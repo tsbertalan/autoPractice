@@ -1,0 +1,10 @@
+dat='HH'
+NDIM = 20,     	IPS   = 2,     	IRS   = 0, 	ILP  = 1
+ICP  = [1,11]
+NTST = 64,   	NCOL  = 7,     	IAD   = 3,     	ISP  = 2,  	ISW  = 1, 	IPLT = 0, 	NBC  = 0, 	NINT = 0
+NMX  = 1000, 	NPR   = 500,	MXBF  = 10,    	IID  = 4,  	ITMX = 8, 	ITNW = 5, 	NWTN = 3, 	JAC  = 0
+EPSL = 1e-6,  	EPSU  = 1e-6,  	EPSS  = 1e-4
+DS   = 1e-2,  	DSMIN = 1e-4,  DSMAX = 1e0,  	IADS = 3
+
+NPAR = 3, THL =  {11:0.0}, THU =  {}
+UZR  = {-1:0}

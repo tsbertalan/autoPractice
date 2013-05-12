@@ -1,0 +1,12 @@
+* unames={1: 'U1', 2: 'U1', 3: 'U1', 4: 'U1', 5: 'U1'}
+parnames={1: 'K', 2: 'r'}
+
+NDIM = 499,	IPS   = 1,	IRS   = 'UZ1',	ILP  = 1
+ICP  = [1,2]
+NTST = 15,    	NCOL  = 4,     	IAD   = 3,     	ISP  = 1,  	ISW  = 1, 	IPLT = 0, 	NBC  = 0,	NINT = 0
+NMX  = 4000, 	RL0=0.0, 	RL1=200.0,	A0=0.0,		A1=1000.0
+NPR   = 100,	MXBF  = 10,    	IID  = 2,  	ITMX = 8, 	ITNW = 5, 	NWTN = 3, 	JAC  = 0
+EPSL = 1e-3,  	EPSU  = 1e-3,  	EPSS  = 1e-3
+DS   = -1e-3,  	DSMIN = -1e-4,  DSMAX = -1e-2,  	IADS = 1
+NPAR = 1, THL =  {}, THU =  {}
+UZR  = {}

@@ -1,0 +1,14 @@
+start=run(e='Kura',c='Kura.start')
+sv(start,'start')
+S = start(101)
+
+fixed = []
+fixed = run(S,c='Kura.fixed')
+sv(fixed,'fixed')
+
+---To write specific output solutions---
+
+fixed(127).writeRawFilename('output127')
+fixed(112).writeRawFilename('output112')
+fixed(114).writeRawFilename('output114')
+

@@ -1,0 +1,12 @@
+* unames={1: 'V', 2: 'm', 3: 'h', 4: 'n', 5: 'Isyn'}
+parnames={1: 'I', 2: 'g', 3: 't'}
+
+NDIM = 20,	IPS   = -2,	IRS   = 0,	ILP  = 0
+ICP  = [1]
+NTST = 16,	NCOL  = 4,	IAD   = 3,	ISP  = 1,	ISW  = 1,	IPLT = 0,	NBC  = 0,	NINT = 0
+NMX  = 100000,	NPR   = 10000,	MXBF  = 10,	IID  = 2,	ITMX = 8,	ITNW = 5,	NWTN = 3,	JAC  = 0
+EPSL = 1e-7,	EPSU  = 1e-7,	EPSS  = 1e-6
+DS   = 1e-1,	DSMIN = 1e-4,	DSMAX = 1e-1,	IADS = 1
+
+NPAR = 3, THL =  {}, THU =  {}
+UZR  = {-14:60}

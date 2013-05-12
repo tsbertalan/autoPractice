@@ -1,0 +1,107 @@
+print "\n***Generate starting data***"
+start=run(e='HH',c='HH.start')
+sv(start,'start')
+S = start('UZ1')
+
+print "\n*** Continuation of fixed point solution ***"
+fixed = []
+fixed = run(S,c='HH.fixed')
+sv(fixed,'fixed')
+H1 = fixed('HB1')
+H2 = fixed('HB2')
+
+print "\n*** Continuation of oscillatory branch 1 down to I=7, PD detection off ***"
+limit = []
+limit = run(H2,c='HH.limit0')
+sv(limit,'limit')
+L1 = limit('UZ1')
+
+print "\n*** Continuation of oscillatory branch 2 from I=7, PD detection on ***"
+limit1 = []
+limit1 = run(L1,c='HH.limit01')
+sv(limit1,'limit1')
+P1 = limit1('PD1')
+P2 = limit1('PD2')
+P3 = limit1('PD3')
+
+pd1 = []
+pd1 = run(P1,c='HH.pd')
+sv(pd1,'pd1')
+
+-------------------------------------------------
+Change c file
+-------------------------------------------------
+
+
+pd12 = []
+cp 13_24.dat HH.dat
+rm -f fort.2 fort.3;
+pd12 = run('HH',c='HH.PDstart')
+sv(pd12,'pd12')
+
+pd13 = []
+cp 12_34.dat HH.dat
+rm -f fort.2 fort.3;
+pd13 = run('HH',c='HH.PDstart')
+sv(pd13,'pd13')
+
+
+fixed=loadbd('fixed')
+limit=loadbd('limit')
+limit1=loadbd('limit1')
+pd1=loadbd('pd1')
+
+pd13 = []
+cp 14_23a.dat HH.dat
+rm -f fort.2 fort.3;
+pd13 = run('HH',c='HH.PDstart')
+sv(pd13,'pd13')
+
+
+
+pd(36).writeRawFilename('output')
+
+pd2 = []
+pd2 = run(P1,c='HH.pd2')
+
+pd3 = []
+pd3 = run(P3,c='HH.pd3')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+______________________________________
+
+pd22 = []
+cp pt_12_34.dat HH1.dat
+rm -f fort.2 fort.3;
+pd22 = run('HH1',c='HH.PDstart')
+sv(pd22,'pd22')
+
+pd13 = []
+cp pt_1_234.dat HH1.dat
+rm -f fort.2 fort.3;
+pd13 = run('HH1',c='HH.PDstart')
+sv(pd13,'pd13')
+
+pd112 = []
+cp pt_1_4_23.dat HH1.dat
+rm -f fort.2 fort.3;
+pd112 = run('HH1',c='HH.PDstart')
+sv(pd112,'pd112')
+
+plot fixed+limit+limit1+pd22+pd13+pd112
