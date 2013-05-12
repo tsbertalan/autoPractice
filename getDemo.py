@@ -1,7 +1,7 @@
 from auto import *
 import pylab as plt
 def myRun(demoname):
-    demo(demoname)
+#     demo(demoname)
     r = run(demoname)
     branchpoints = r("BP")
     for solution in branchpoints:
