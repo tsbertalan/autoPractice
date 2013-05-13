@@ -4,22 +4,23 @@
 !---------------------------------------------------------------------- 
 !---------------------------------------------------------------------- 
 
-      SUBROUTINE FUNC(NDIM,U,ICP,PAR,IJAC,F,DFDU,DFDP)
+SUBROUTINE FUNC(NDIM,U,ICP,PAR,IJAC,F,DFDU,DFDP)
 !     ---------- ----
 
-!      IMPLICIT NONE
-      INTEGER, INTENT(IN) :: NDIM, ICP(*), IJAC
-      DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
-      DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
-      DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-      DOUBLE PRECISION VTC(NDIM/4), hTC(NDIM/4), VRE(NDIM/4), hRE(NDIM/4), s
-      DOUBLE PRECISION sinfVTC(NDIM/4), dVTCdt(NDIM/4), dhTCdt(NDIM/4), dVREdt(NDIM/4), dhREdt(NDIM/4)
-      INTEGER N
-!      DOUBLE PRECISION, dimension(NDIM/4) :: minf_(NDIM/4), Hinf_(NDIM/4), sinf_(NDIM/4), tauinf_(NDIM/4), theSum_(NDIM/4)
-      DOUBLE PRECISION, dimension(NDIM/4) :: minf_, Hinf_, sinf_, tauinf_, theSum_
+!    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: NDIM, ICP(*), IJAC
+    DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
+    DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
+    DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
+    DOUBLE PRECISION, dimension(NDIM/4) :: VTC, hTC, VRE, hRE, dVTCdt, dhTCdt, dVREdt, dhREdt, theSum
+    INTEGER N, i, k, omega, theIndex
+    DOUBLE PRECISION s, minf, Hinf, sinf, tauinf
 
-real this, sigs, thh, sigh, thm, sigm, thtau, sigtau, tau1, tau2
-real gLTC, VLTC, VsynTC, gLRE, VLRE, epRE, VsynRE, gCa, Cm
+    DOUBLE PRECISION ths, sigs, thh, sigh, thm, sigm, thtau, sigtau, tau1, tau2
+    DOUBLE PRECISION gLTC, VLTC, VsynTC, gLRE, VLRE, epRE, VsynRE, gCa, Cm, v
+
+!# bifurcation parameters
+    double precision epTC, gTC, gRE, VCa
 
     ths = -20
     sigs = 2
@@ -42,34 +43,53 @@ real gLTC, VLTC, VsynTC, gLRE, VLRE, epRE, VsynRE, gCa, Cm
     gCa = 1
     Cm = 1
 
+    N = NDIM / 4
 
-      N = NDIM / 4
+    VTC = U(0*N:1*N)
+    hTC = U(1*N:2*N)
+    VRE = U(2*N:3*N)
+    hRE = U(3*N:4*N)
 
+    s=PAR(1)
+    epTC = 1 + 2 * s
+    gTC = 0.03 + 0.07 * s
+    gRE = 0.1 + 0.2 * s
+    VCa = 120 - 30 * s
 
-      VTC = U(0*N:1*N)
-      hTC = U(1*N:2*N)
-      VRE = U(2*N:3*N)
-      hRE = U(3*N:4*N)
+    omega = 6
 
-      s=PAR(1)
+    theSum = 0d0
+    do i=1,N
+        do k=-omega,omega+1
+            theIndex = i + k
+            if (theIndex >= N) then
+             theIndex = theIndex - N
+            endif
+            theSum(i) = theSum(i) + sinf(VTC(theIndex))
+    !                theSum(i) = theSum(i) + 1
+        end do
+    end do
 
-      sinfVTC = sinf(VTC)
-
-      dVTCdt = (-gLTC * (VTC - VLTC) &
-                  -gCa * (minf(VTC)) ** 3 * hTC * (VTC - VCa) &
-                  -gTC * sinf(VRE) * (VTC - VsynRE) &
+    !      sinfVTC = sinf(VTC)
+    do i=1,N
+      dVTCdt(i) = (-gLTC * (VTC(i) - VLTC) &
+                  -gCa * (minf(VTC(i))) ** 3 * hTC(i) * (VTC(i) - VCa) &
+                  -gTC * sinf(VRE(i)) * (VTC(i) - VsynRE) &
+                  ) / Cm
+      dhTCdt(i) = epTC * (hinf(VTC(i)) - hTC(i)) / tauinf(VTC(i))
+      dVREdt(i) = (-gLRE * (VRE(i) - VLRE) &
+                  -gCa * (minf(VRE(i))) ** 3 * hRE(i) * (VRE(i) - VCa) &
+                  -gRE / (2*omega+1) * theSum(i) * (VRE(i) - VsynTC) &
                  ) / Cm
-      dhTCdt = epTC * (hinf(VTC) - hTC) / tauinf(VTC)
-      dVREdt = (-gLRE * (VRE - VLRE) &
-                  -gCa * (minf(VRE)) ** 3 * hRE * (VRE - VCa) &
-                  -gRE / (2*omega+1) * theSum(sinfVTC) * (VRE - VsynTC) &
-                 ) / Cm
-      dhREdt = epRE * (hinf(VRE) - hRE) / tauinf(VRE)
+      dhREdt(i) = epRE * (hinf(VRE(i)) - hRE(i)) / tauinf(VRE(i))
+    end do
 
-      U(0*N:1*N) = dVTCdt
-      U(1*N:2*N) = dhTRdt
-      U(2*N:3*N) = dVREdt
-      U(3*N:4*N) = dhREdt
+    do i=1,N
+        F(0*N + i) = dVTCdt(i)
+        F(1*N + i) = dhTRdt(i)
+        F(2*N + i) = dVREdt(i)
+        F(3*N + i) = dhREdt(i)
+    end do
 
 !        # Wasylenko 2010, Sec. 3.2:
 !        #  First, we started with a perturbation in the vTC from the (spatially
@@ -96,11 +116,11 @@ real gLTC, VLTC, VsynTC, gLRE, VLRE, epRE, VsynRE, gCa, Cm
 
        PAR(1)=0.5
 
-        U(0*N:1*N) = -49  ! VTC_0
-        U(1*N:2*N) = 0    ! hTC_0
-        U(2*N:3*N) = -78  ! VRE_0
-        U(3*N:4*N) = 0.5  ! hRE_0
-        U(omega+3) = 0    ! a small perturbation in VTC_0
+        U(0*NDIM/4:1*NDIM/4) = -49  ! VTC_0
+        U(1*NDIM/4:2*NDIM/4) = 0    ! hTC_0
+        U(2*NDIM/4:3*NDIM/4) = -78  ! VRE_0
+        U(3*NDIM/4:4*NDIM/4) = 0.5  ! hRE_0
+        U(6+3) = 0    ! a small perturbation in VTC_0
 
       END SUBROUTINE STPNT
 
@@ -136,24 +156,4 @@ real gLTC, VLTC, VsynTC, gLRE, VLRE, epRE, VsynRE, gCa, Cm
         tauinf = tau1 + (tau2 - tau1) / (1 + exp(-(v - thtau) / sigtau))
       END FUNCTION
 
-      DOUBLE PRECISION function theSum(sinfVTC)
-      DOUBLE PRECISION, INTENT(IN) :: sinfVTC(*)
-      INTEGER i, k, N, theIndex, theShape(*)
-      DOUBLE PRECISION, DIMENSION(*) :: theSum
-!        '''Used for computing the sum of inputs to each of the
-!        RE neurons. Takes as argument a precomputed vector of s_inf(v_i)
-!        values for each of the TC neurons' voltages, v_i.'''
-        theShape = shape(sinfVTC)
-        N = theShape(1)
-        theSum = 0d0
-        do i=1,N
-            do k=-omega,omega+1
-                theIndex = i + k
-                if (theIndex >= N) then
-                 theIndex = theIndex - N
-                endif
-                theSum(i) = theSum(i) + sinfVTC(theIndex)
-            end do
-        end do
-        END SUBROUTINE
 
