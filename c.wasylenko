@@ -1,13 +1,16 @@
 parnames = {1: 's'}
-#unames = {1: 'x', 2: 'y', 3: 'z'}
+#unames = {}  # we cannot name 240 variables. This is like Cruella Deville naming all 101 dalmatians.
 NDIM=   240
-IPS =   1
+IPS =   -2
 IRS =   0
 ILP =   0
 ICP =  ['s']
-NTST=  35, NCOL=   4, IAD =   3, ISP =   2, ISW = 1, IPLT= 0, NBC= 0, NINT= 0
-NMX=   50, NPR=  100, MXBF=  10, IID =   2, ITMX= 8, ITNW= 7, NWTN= 3, JAC= 0
+
+# try ISP=2
+NTST=  35, NCOL=   4, IAD =   3, ISP =   0,    ISW = 1, IPLT= 0, NBC= 0, NINT= 0
+NMX=   100000, NPR=  10000, MXBF=  10, IID =   2, ITMX= 8, ITNW= 5, NWTN= 3, JAC= 0
 EPSL= 1e-07, EPSU = 1e-07, EPSS =0.0001
-DS  =   0.1, DSMIN=  0.01, DSMAX=   5.0, IADS=   1
-NPAR = 3, THL =  {'PERIOD': 0.0}, THU =  {}
-UZSTOP = {'rho': 30.0}
+DS  =   0.1, DSMIN=  0.0001, DSMAX=   1e-1, IADS=   1
+NPAR = 1, THL =  {}, THU =  {}
+UZSTOP = {'s': [0.0, 1.0]}
+
