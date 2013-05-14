@@ -59,6 +59,43 @@ initial = [ "-4.90000000e+01", "-4.90000000e+01", "-4.90000000e+01", "-4.9000000
  "2.10205264e-03", "2.13509269e-03", "2.33597838e-03", "2.65034122e-03",
  "3.14992559e-03", "3.97567560e-03", "7.64320255e-03", "8.49775599e-03"]
 
-#from sys import exit; exit()
-for i, x in enumerate(initial):
-    print "U(%d) = %s" % (i+1, x)
+import matplotlib.pyplot as plt
+from wasylenko import main, plotMultiple
+import numpy as np
+import pprint
+
+def getSoln(verbose=False, X0=None, tmax=3000, s=0.5):
+    '''Use X0=np.zeros((240,)) for an initial zero condition.'''
+    # X, T = main(N=60, omega=6, tmax=2000, s=0.6, nstep=1000, verbose=False, X0=np.zeros((240,)))
+    X, T = main(N=60, omega=6, tmax=tmax, s=s, nstep=1000, verbose=verbose, X0=X0)
+    return X, T
+    
+# print X.shape
+
+def displayFortran():
+    X, T = getSoln(verbose=False)
+    initial = X[800, :]
+    pp = pprint.PrettyPrinter(indent=4).pprint
+    pp((X.shape, T.shape))
+    for i, j in enumerate(initial):
+        print "U(%d) = %s" % (i+1, j)
+    plt.plot(initial)
+    plt.show()
+
+def writeDatFile(verbose=False, X0=None):
+    X, T = getSoln(verbose=True, tmax=5000, s=0.5)
+    plotMultiple(X[800:, :], T[800:], s=0.5, show=True)
+    
+    # from sys import exit; exit()
+    datfile = file('wasy.dat', 'w')
+    for i in range(800, T.size):
+        datfile.write(str(T[i]) + ' ')
+        for j in range(X[i,:].size):
+            datfile.write(str(X[i,j]) + ' ')
+        datfile.write('\n')
+    datfile.flush()
+    datfile.close()
+
+if __name__=="__main__":
+#     displayFotran()
+    writeDatFile()
