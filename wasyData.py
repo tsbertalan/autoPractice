@@ -80,7 +80,6 @@ def displayFortran(stationary=False):
     X, T = getSoln(verbose=False, plot=True, X0=X0)
     initial = X[800, :]
     pp = pprint.PrettyPrinter(indent=4).pprint
-    pp((X.shape, T.shape))
     for i, j in enumerate(initial):
         print "U(%d) = %s" % (i+1, j)
     plt.plot(initial)
@@ -90,6 +89,9 @@ def writeDatFile(verbose=False, X0=None):
     '''Creates a file wasy.dat that contains a full period
     of the traveling wave solution.'''
     X, T = getSoln(verbose=True, tmax=5000, s=0.5)
+    print T
+    print T[44]
+    print T[158]
     plotMultiple(X[800:, :], T[800:], s=0.5, show=True)
     
     # from sys import exit; exit()
@@ -103,6 +105,6 @@ def writeDatFile(verbose=False, X0=None):
     datfile.close()
 
 if __name__=="__main__":
-#     displayFotran(stationary=False) # print out Fortran code for initializing for a stationary solution.
-#     displayFortran(stationary=True)  # print out Fortran code for initializing for a traveling-wave
+#     displayFortran(stationary=False) # print out Fortran code for initializing for a traveling-wave
+#     displayFortran(stationary=True)  # print out Fortran code for initializing for a stationary solution.
     writeDatFile()

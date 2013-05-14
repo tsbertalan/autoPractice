@@ -55,7 +55,7 @@ ICP  = ['s']  # For each equation type and for each continuation calculation the
               #  number of problem parameters that must be allowed to vary, in order for the calculations to be
               #  properly posed. The array ICP designates these free parameters. The parameter that appears
               #  first in the ICP list is called the “principal continuation parameter”.
-NTST = 35  # The number of mesh intervals used for discretization.
+NTST = 20  # The number of mesh intervals used for discretization.
 NCOL = 4  # The number of Gauss collocation points per mesh interval, (2 ≤ NCOL ≤ 7).
 IAD  = 3  # IAD=0 : Fixed mesh. Normally, this choice should never be used.
           #  IAD>0 : Adapt the mesh every IAD steps along the family. Most demos use IAD=3, which is the strongly recommended value.
@@ -94,13 +94,13 @@ ISW  = 1  # This constant controls branch switching at branch points for the cas
           #  points will be computed. An additional free parameter must be specified for such continuations; see also Section 10.7.
           #  - ISW=3 : If IRS is the label of a branch point in a generic (non-symmetric) system then a locus of such points will be computed. Two additional free parameters must be specified
           #  for such continuations; see also Section 10.7.
-IPLT = 0  #  If IPLT = 0 then the L2 -norm is printed.
-NBC  = 0  # The number of boundary conditions as specified in the user-supplied routine BCND.
-NINT = 0  # The number of integral conditions as specified in the user-supplied routine ICND.
+#IPLT = 0  #  If IPLT = 0 then the L2 -norm is printed.
+#NBC  = 0  # The number of boundary conditions as specified in the user-supplied routine BCND.
+#NINT = 0  # The number of integral conditions as specified in the user-supplied routine ICND.
 NMX  = 1000000  # The maximum number of steps to be taken along any family.
-NPR  = 10000
+NPR  = 10000  # This constant can be used to regularly write fort.8 plotting and restart data.
 MXBF = 10  # This constant, which is effective for algebraic problems only, sets the maximum number of bifurcations to be treated.
-IID  = 2  # This constant controls the amount of diagnostic output printed in fort.9 : the greater IID the
+IID  = 3  # This constant controls the amount of diagnostic output printed in fort.9 : the greater IID the
           #  more detailed the diagnostic output.
           #  - IID=0 : No diagnostic output.
           #  - IID=1 : Minimal diagnostic output. This setting is not recommended.
@@ -137,16 +137,16 @@ EPSL = 1e-07  # Relative convergence criterion for equation parameters in the Ne
               #  demos use EPSL=10^−6 or EPSL=10^−7 , which is the recommended value range.
 EPSU = 1e-07  # Relative convergence criterion for solution components in the Newton/Chord method. Most
               #  demos use EPSU=10^−6 or EPSU=10^−7 , which is the recommended value range.
-EPSS = 0.0001  # Relative arclength convergence criterion for the detection of special solutions.
+#EPSS = .0001 # Relative arclength convergence criterion for the detection of special solutions.
                #  Most demos use 10^−4 or 10^-5 , which is the recommended value range. Generally, EPSS should be
                #  approximately 100 to 1000 times the value of EPSL, EPSU.
 DS   = 0.01  # AUTO uses pseudo-arclength continuation for following solution families. The pseudo-arclength stepsize is the distance between the current solution and the next solution on a family.
 DSMIN= 0.0001  # This is minimum allowable absolute value of the pseudo-arclength stepsize. 
 DSMAX= 1e-1  # The maximum allowable absolute value of the pseudo-arclength stepsize.
-IADS = 1  # IADS=0 : Use fixed pseudo-arclength stepsize. Not recommended.
+IADS = 0  # IADS=0 : Use fixed pseudo-arclength stepsize. Not recommended.
 	      #  IADS>0 : Adapt the pseudo-arclength stepsize after every IADS steps.
 NPAR = 1
-THL  =  {}  # By default, the pseudo-arclength stepsize includes all state variables (or state functions) and all
+#THL  =  {11:0.0}  # By default, the pseudo-arclength stepsize includes all state variables (or state functions) and all
             #  free parameters. Under certain circumstances one may want to modify the weight accorded to
             #  individual parameters in the definition of stepsize. For this purpose, THL defines the parameters
             #  whose weight is to be modified.
@@ -154,10 +154,10 @@ THU  =  {}  # Under certain circumstances one may want to modify the weight acco
             #  variables (or state functions) in the definition of stepsize. For this purpose, THU defines the
             #  number of states whose weight is to be modified. If THU={} then all weights will have default
             #  value 1.0, else one must enter pairs, {State Index : Weight, ...} .use this option.
-#UZSTOP = {'s': [0.0, 1.0]}
-UZR = {1:.6, 1:0.0, 1:5e-1}
+#UZSTOP = {'s': [0.0, 0.6 1.0]}
+UZR = {1:[.6, 0, .5, .7]}
 RL0 = 0.0  # The lower bound on the principal continuation parameter. (This is the parameter which appears first in the ICP list.
 RL1 = 1.0  # The upper bound on the principal continuation parameter.
-#A0 = 0  # The lower bound on the principal solution measure. (By default, the principal solution measure is the L2 -norm of the state vector)
-#A1 = 1000  # The upper bound on the principal solution measure.
+A0 = 0  # The lower bound on the principal solution measure. (By default, the principal solution measure is the L2 -norm of the state vector)
+A1 = 1000  # The upper bound on the principal solution measure.
 

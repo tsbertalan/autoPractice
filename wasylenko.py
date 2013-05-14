@@ -167,7 +167,6 @@ def main(N=60, omega=6, s=.5, plot=True, tmax=.125, nstep=1000, verbose=True, X0
 
 def plotMultiple(X, T, s=0.5, show=False):
     N = X.shape[1] / 4
-    print N
     N = int(N)
     fig = plt.figure(figsize=(11*1.5, 8.5*1.5))
     axes = [fig.add_subplot(1, 4, i+1) for i in range(4)]
