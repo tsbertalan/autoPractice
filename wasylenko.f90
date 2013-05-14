@@ -93,7 +93,7 @@ SUBROUTINE FUNC(NDIM,U,ICP,PAR,IJAC,F,DFDU,DFDP)
 !    i = 4
 !    print *, "PAR(11):", PAR(11)
 !    print *, "df(4):", dVTCdt(i), dhTCdt(i), dVREdt(i), dhREdt(i)
-!    print *, "f(4):", VTC(4), hTC(4), VRE(4), hRE(4), "s:", s
+!    print *, "f(4):", VTC(4), hTC(4), VRE(4), hRE(4), "s:", s, "pd:", PAR(11)
 !    if (abs(VTC(4)) > 100) then
 !        print *, "THE SINGULARITY IS NIGH", &
 !                  -gLTC * (VTC(i) - VLTC), &
@@ -124,7 +124,7 @@ SUBROUTINE STPNT(NDIM,U,PAR,T)
       N = NDIM / 4
 
        PAR(1)=0.5
-       PAR(11)=570.6  ! override Auto's choice of period
+!       PAR(11)=570.6  ! override Auto's choice of period
 
 !! use this to initialize for a steady-state:
 !    do i=1,N
