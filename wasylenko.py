@@ -208,6 +208,21 @@ def sRange():
     fig4.suptitle("$V^{TC}$ averaged across %d neurons for different values of $s$" % N)
     fig4.savefig("averge_VTC_values_over_s.pdf")
 
+def poi(s):
+    # trying to do fig 4
+    X, T = main(tmax=2000, s=s, N=60, omega=6)
+    N = X.shape[1]
+    fig = plt.figure()
+    VTC = X[0:N,-1]
+    ax = fig.gca()
+    vp = []
+    vm = []
+    for i in range(N-3):
+        vp.append(VTC[i+1])
+        vm.append(VTC[i-1])
+    ax.scatter(vp, vm)
+    plt.show()
+
 if __name__=="__main__":
     main(N=60, omega=6, tmax=2000, s=0.6, nstep=1000)
     # uncomment either the sRange line to run for many values of s:
