@@ -154,7 +154,7 @@ def main(N=60, omega=6, s=.5, plot=True, tmax=.125, nstep=1000, verbose=True, X0
     X, T = doint(X0, diff, tmin=0, tmax=tmax, nstep=nstep)
     
     if plot:
-        plotMultiple(X, T)
+        plotMultiple(X, T, s=s)
         
     # This is what I used to determine the "resting" conditions
     #  (except, without the transient BC-modification):
@@ -188,8 +188,8 @@ def plotMultiple(X, T, s=0.5, show=False):
         ax2.plot(X[-50:-1, i], X[-50:-1, 2*N+i], 'k')
     ax2.set_xlabel(r"$V^{TC}$")
     ax2.set_ylabel(r"$V^{RE}$")
-    fig2.suptitle(r"$s=%.2f$" % s)
-    fig2.savefig("phasespace-s%.2f.pdf" % s)
+    fig2.suptitle(r"$s=%.4f$" % s)
+    fig2.savefig("phasespace-s%.4f.pdf" % s)
 
     fig3 = plt.figure()
     ax3 = fig3.gca()
@@ -219,26 +219,56 @@ def sRange():
     fig4.suptitle("$V^{TC}$ averaged across %d neurons for different values of $s$" % N)
     fig4.savefig("averge_VTC_values_over_s.pdf")
 
-def poi(s):
+def poi(s, tmax=2000, N=60, omega=6):
     # trying to do fig 4
-    X, T = main(tmax=2000, s=s, N=60, omega=6)
-    N = X.shape[1]
+    X, T = main(tmax=tmax, s=s, N=N, omega=omega)
+    #N = X.shape[1]
+    N = 20
+    Tmax = X.shape[0]
     fig = plt.figure()
     VTC = X[0:N,-1]
     ax = fig.gca()
+    #for j, color in zip([600, 700, 800], ['red', 'blue', 'green']):
+    color='green'
+    #for j, color in zip([800], ['green']):
+    cutIndices = []
+    for p0 in range(-10, 50):
+        for j in range(585, 1000):
+            for i in range(N):
+                if  p0 < X[j,i] < p0+1:  # take cuts near-ish to peak
+                    cutIndices.append((j, i))
     vp = []
     vm = []
-    for i in range(N-3):
-        vp.append(VTC[i+1])
-        vm.append(VTC[i-1])
+    for cutIndex in cutIndices:
+        left = list(cutIndex)
+        left[1] -= 1
+        right = list(cutIndex)
+        right[1] += 1
+        
+        if left[1] < 0:
+            left[1] += N
+        if right[1] >= N:
+            right[1] -= N
+        print cutIndex, left, right
+        try:
+            vp.append(X[left])
+            vm.append(X[right])
+            #ax.scatter([i], [j])
+        except:
+            pass
     ax.scatter(vp, vm)
+    #ax.legend(loc="best")
+    ax.set_xlabel(r"$V^{TC}_{j+1}$")
+    ax.set_ylabel(r"$V^{TC}_{j-1}$")
+    #ax.plot(X[800, 12:34])
     plt.show()
 
 if __name__=="__main__":
-    main(N=60, omega=6, tmax=2000, s=0.6, nstep=1000)
+    #main(N=60, omega=6, tmax=2000, s=0.6, nstep=1000)
     # uncomment either the sRange line to run for many values of s:
 #     sRange()
     # In that case, you might want to comment out the plt.show line.
+    poi(0.715)
     plt.show()
     
 
