@@ -122,9 +122,10 @@ C_m \dfrac{dv_i^{RE}}{dt} = -g_L^{RE}(v_i^{RE} - V_L^{RE}) - g_{Ca}(m_{\infty}(v
 \dfrac{dh_i^{RE}}{dt} = \epsilon^{RE}\left[\dfrac{h_{infty}v_i^{RE}-h_i^{RE}}{\tau_{\infty}(v_i^{RE})}\right]
 \end{eqnarray}
 
-where the functions $m_{\infty}$, $h_{\infty}$, $s_{\infty}$, and $\tau_{\infty}$ and associated constants are given in Wasylenko et al. As in the paper, our model used 60 neurons for a total 240-equation system, with $\omega=6$.\cite{Wasylenko2010}
+\textbf{We should include these functions and constants here as well. Not only does it lengthen our paper, but it also makes the model completely reproducible from this document alone, which is good.}
+where the functions $m_{\infty}$, $h_{\infty}$, $s_{\infty}$, and $\tau_{\infty}$ and associated constants are given in Wasylenko et al. As in the paper, our model used a mesh circumference of 60 neurons for a total of 120 neurons and 240 equations, with $\omega=6$.\cite{Wasylenko2010}
 
-The Wasylenko model was chosen because of its simplicity (only 4 equatios per site in the 1-D network) and because other studies of lurching waves in neuronal networks involved inelegant ``reset'' conditions on neuron voltages after firing.\cite{Golomb1999}
+The Wasylenko model was chosen because of its simplicity (only 4 equations per site in the 1-D network) compared to full Hodgkin-Huxley \cite{Izhikevich2004} and because other studies of lurching waves in neuronal networks involved ``reset'' conditions on neuron voltages after firing that were based on rules rather than analytic functions. \cite{Golomb1999}
 
 Our goal was to first model the network of neurons described in the paper to observe qualitatively different forms of wave propagation throughout the 1-D network. We then tried to implement continuation techniques to follow branches of solutions and study the transitions between different unstable and stable solutions.
 
@@ -169,7 +170,9 @@ Our goal was to first model the network of neurons described in the paper to obs
                 \label{fig:phase72}
         \end{subfigure}
 
-  \caption{Numerical integration ({\bf a}, {\bf c}, and {\bf e}) and phase portraits ({\bf b}, {\bf d}, and {\bf f}) with different values of the bifurcation parameter 's'}
+  \caption{Numerical integration ({\bf a}, {\bf c}, and {\bf e}) and phase portraits ({\bf b}, {\bf d}, and {\bf f}) with different values of the bifurcation parameter $s$
+\textbf{  These figures should be rendered at a size such that their axis labels are readable. You should be able to do this by altering s=xxx in the last lines of wasylenko.py and running it. Save and resave the png with the floppy disk in the corner of the matplotlib window while resizing the window, until it looks right.}
+}
   \label{fig:numint72}
 \end{figure}
 
@@ -186,42 +189,49 @@ Our goal was to first model the network of neurons described in the paper to obs
                 \caption{s = 0.71}
                 \label{fig:phase71}
         \end{subfigure}
-  \caption{Numerical integration ({\bf a}) and phase portraits ({\bf b}) with 's' = 0.71}
+  \caption{Numerical integration ({\bf a}) and phase portraits ({\bf b}) with $s = 0.71$}
   \label{fig:quasiper}
 \end{figure}
 
 \section{Numerical Integration}
 
 
-We used direct time integration in Python study the possible solutions as we change the bifurcation parameter, 's', over the range of values used in Wasylenko et al.\cite{Wasylenko2010} The results are shown in Figure~\ref{fig:numint}.
+We used direct time integration in Python using \texttt{scipy.integrate} to study the possible solutions as we change the bifurcation parameter, $s$, over the range of values used in Wasylenko et al.\cite{Wasylenko2010} The results are shown in Figure~\ref{fig:numint}.
 
-In all of the space-time plots (Figure~\ref{fig:numint} {\bf a}, {\bf b}, and {\bf c}), we see a wave representing the voltages of the TC neurons. As 's' is varied from 0.60 to 0.72 we observed that the behavior of the waves also changed. For lower values of 's', the behavior is almost like a continuous chain of neurons because the ``perturbation'' introduced by this small discretization is low. This is a ``smooth'' wave, or a ``1-lurcher''. At $s=0.70$ the system starts to exhibit transient lurching behavior---the transient part of the solution appears to be almost quasiperiodic, but then settles down to a smoother wave. Above that, around $s=0.72$ the lurching is persistent and is a true 6-lurcher.
+In all of the space-time plots (Figure~\ref{fig:numint} {\bf a}, {\bf b}, and {\bf c}), we see a wave representing the voltages of the TC neurons. As $s$ is varied from 0.60 to 0.72 we observed that the behavior of the waves also changed. For lower values of $s$, the behavior is almost like a continuous chain of neurons because the ``perturbation'' introduced by this small discretization is low. This is a ``smooth'' wave, or a ``1-lurcher''. At $s=0.70$ the system starts to exhibit transient lurching behavior---the transient part of the solution appears to be almost quasiperiodic, but then settles down to a smoother wave. Above that, around $s=0.72$ the lurching is persistent and is a true 6-lurcher.
 
 The phase portraits in $V^{TC}$-$V^{RE}$ space show the trajectories that the neurons in the lattice follow. For the smooth wave, all of the neurons follow the same path. Though we did not plot Poincar\'{e} maps, we would expect there to be only one fixed point in the map, indicating a stable limit cycle. For the transient lurcher, we observe that the phase portrait contains more than one path, but the paths are not clearly separated. If we were to integrate for more time we would expect to see the paths converge, and we would expect the Poincar\'{e} map to approach a closed curve indicative of a torus solution. For the stable 6-lurcher, there are six separate paths in the phase plane even after long integration times. The Poincar\'{e} map would show six discrete points.
 
-In Figure~\ref{fig:numint71}, 's' is set to an intermediate value between lurching and transient, where 's' = 71. To the eye, it appears as if solution will continue lurching indefinitely, but the phase portrait associated with it seems to hint that is actually near the beginngs of a toral solution.
+In Figure~\ref{fig:numint71}, $s$ is set to an intermediate value between lurching and transient, where $s = 71$. To the eye, it appears as if solution will continue lurching indefinitely, but the phase portrait associated with it seems to hint that is actually near the beginnings of a toral solution.
+\textbf{What is a toral solution? I know you mean it as an adjectival form of torus, but I just don't understand how one lurcher can be mapped to a torus, while another can't. It seems to me that, since it has a period in space (the ring circumference) and another in time (the coupled frequency of the pulsing network), any of these traveling waves can be mapped on a torus, although some might be quasiperiodic, and therefore would eventually cover the whole torus.}
 
 \section{Continuation}
 
-We used continuation techniques in AUTO with FORTRAN in order to study the bifurcations of stable and unstable solutions as the parameter 's' is varied. However, we were not able to get the AUTO and FORTRAN files to follow a branch of solutions.
+We used continuation techniques in AUTO with FORTRAN in order to study the bifurcations of stable and unstable solutions as the parameter $s$ is varied. However, we were not able to get the AUTO and FORTRAN files to follow a branch of solutions.
 
-Rather than implementing the period-shift Poincar\'{e} map used in Wasylenko et al.\cite{Wasylenko2010}, we opted for a map which integrated over the entire network of neurons for the ``true'' period for feasibility of coding. However, we would want to inplement the period-shift code eventually in order to make the calculation more efficient.
+Rather than implementing the period-shift Poincar\'{e} map used in Wasylenko et al.\cite{Wasylenko2010}, we opted for a map which integrated over the entire network of neurons for the ``true'' period for feasibility of coding. However, we would want to implement the period-shift code eventually in order to make the calculation more efficient.
 
-Our continuation methods allowed us to visualize only one quilibrium point before terminating with no convergence (Figure~\ref{fig:EP}). Further debugging is needed to determine why the continuation protocol does not diverge. However, we were able to plot solutions for the voltages and gating variables through AUTO, as well as obgain a plot in phase space which looked similar to those obtained in Python and in Wasylenko et al.\cite{Wasylenko2010}
+Our continuation methods allowed us to visualize only one equilibrium point before terminating with no convergence (Figure~\ref{fig:EP}). Further debugging is needed to determine why the continuation does not find any branches. However, we were able to plot periodic solutions for the voltages and gating variables through AUTO, as well as obtain a plot in phase space which looked similar to those obtained in Python and in Wasylenko et al.\cite{Wasylenko2010}
+\textbf{The one equilibrium point shown in Auto is really just the initial traveling-wave solution from wasy.dat. I don't think Auto can be given credit for finding it. So, I'm not sure if Figure~\ref{fig:EP} is meaningful.}
 
-We suspect that part of the problem with our AUTO code is specifying the correct period length in AUTO. The constants in the AUTO constants file likely also need to be optimized in order to follow the branch of solutions.
+We supplied AUTO with a complete periodic solution for $s = 0.5$, from which it was correctly able to extract a period of $600$. However, the AUTO constants file still needs to be modified to follow the branch of solutions.
+\textbf{Actually, the one thing I did achieve by Matt's suggestions yesterday was getting Auto to correctly find the period based on the input data in wasy.dat.}
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.5\textwidth]{4dNOPE.png}
-  \caption{Poincar\'{e} map of the 3-lurcher. This map was meant to be similar to Figure 4d of Wasylenko et al. However, the points do not appear to fall on a closed curve on the map. This is likely due to remaining bugs in the code.}
+  \caption{Poincar\'{e} map of the 3-lurcher. This map was meant to be similar to Figure 4d of Wasylenko et al. However, the points do not appear to fall on a closed curve on the map. This is likely due to remaining bugs in the code.
+  \textbf{I added axis labels.}
+  }
   \label{fig:4dNOPE}
 \end{figure}
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.5\textwidth]{VRE.png}
-  \caption{Solution for a RE neuron.}
+  \caption{Solution for a RE neuron.
+  \textbf{I think we should make it clear that these were obtained with AUTO, not the python integrator.}
+  }
   \label{fig:VRE}
 \end{figure}
 
