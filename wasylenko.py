@@ -181,6 +181,7 @@ def plotMultiple(X, T, s=0.5, show=False):
         fig.colorbar(imgplots[i], orientation ='horizontal')
     fig.suptitle(r"$s=%.2f$" % s)
     fig.savefig("wasylenko_waves-s%.2f.pdf" % s)
+
     fig2 = plt.figure()
     ax2 = fig2.add_subplot(1, 1, 1)
     for i in range(N):
@@ -189,6 +190,16 @@ def plotMultiple(X, T, s=0.5, show=False):
     ax2.set_ylabel(r"$V^{RE}$")
     fig2.suptitle(r"$s=%.2f$" % s)
     fig2.savefig("phasespace-s%.2f.pdf" % s)
+
+    fig3 = plt.figure()
+    ax3 = fig3.gca()
+    im = ax3.imshow(X[:, 0:N], aspect="auto", origin="lower")
+    im.set_interpolation('nearest')
+    im.set_extent([0, N, min(T), max(T)])
+    ax3.set_xlabel(r'$V^{TC}$ neuron index')
+    ax3.set_ylabel('time')
+    fig3.colorbar(im)
+
     if show:
         plt.show()
 
