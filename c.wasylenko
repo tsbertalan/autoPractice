@@ -1,16 +1,163 @@
+dat = "wasy"
 parnames = {1: 's'}
-#unames = {}  # we cannot name 240 variables. This is like Cruella Deville naming all 101 dalmatians.
-NDIM=   240
-IPS =   -2
-IRS =   0
-ILP =   0
-ICP =  ['s']
+#unames = {}  # we cannot name 240 variables. That would be like Cruella Deville naming all 101 dalmatians.
+NDIM = 240  # number of state variables
+IPS  = +2  # This constant defines the problem type :
+           #  - IPS=0 : An algebraic bifurcation problem. Hopf bifurcations will not be detected and
+           #  stability properties will not be indicated in the fort.7 output-file.
+           #  - IPS=1 : Stationary solutions of ODEs with detection of Hopf bifurcations. The sign of
+           #  PT, the point number, in fort.7 is used to indicate stability : − is stable , + is unstable.
+           #  - IPS=−1 : Fixed points of the discrete dynamical system u(k+1) = f (u(k) , p), with detection
+           #  of Hopf bifurcations. The sign of PT in fort.7 indicates stability : − is stable , + is
+           #  unstable. (Demo 
+           #  - IPS=−2 : Time integration using implicit Euler. The AUTO-constants DS, DSMIN, DSMAX,
+           #  and ITNW, NWTN control the stepsize. In fact, pseudo-arclength is used for “continuation in
+           #  time”. Note that the time discretization is only first order accurate, so that results should
+           #  be carefully interpreted. Indeed, this option has been included primarily for the detection
+           #  of stationary solutions, which can then be entered in the user-supplied routine STPNT.
+           #  (Demo ivp.)
+           #  - IPS=2 : Computation of periodic solutions. Starting data can be a Hopf bifurcation
+           #  point (Run 2 of demo ab), a periodic orbit from a previous run (Run 4 of demo pp2), an
+           #  analytically known periodic orbit (Run 1 of demo frc), or a numerically known periodic
+           #  orbit (Demo lor). The sign of PT in fort.7 is used to indicate stability : − is stable , +
+           #  is unstable or unknown.
+           #  - IPS=4 : A boundary value problem. Boundary conditions must be specified in the user-
+           #  - IPS=5 : Algebraic optimization problems. The objective function must be specified in the
+           #  - IPS=7 : A boundary value problem with computation of Floquet multipliers. This is a
+           #  - IPS=9 : This option is used in connection with the HomCont algorithms described in
+           #  - IPS=11 : Spatially uniform solutions of a system of parabolic PDEs, with detection of
+           #  traveling wave bifurcations. The user need only define the nonlinearity (in routine FUNC),
+           #  initialize the wave speed in PAR(10), initialize the diffusion constants in PAR(15,16,· · · ),
+           #  and set a free equation parameter in ICP(1). (Run 2 of demo wav.)
+           #  - IPS=12 : Continuation of traveling wave solutions to a system of parabolic PDEs. Starting
+           #  - IPS=14 : Time evolution for a system of parabolic PDEs subject to periodic boundary
+           #  - IPS=15 : Optimization of periodic solutions. The integrand of the objective functional
+           #  - IPS=16 : This option is similar to IPS=14, except that the user supplies the boundary
+           #  - IPS=17 : This option can be used to continue stationary solutions of parabolic systems
 
-# try ISP=2
-NTST=  35, NCOL=   4, IAD =   3, ISP =   0,    ISW = 1, IPLT= 0, NBC= 0, NINT= 0
-NMX=   100000, NPR=  10000, MXBF=  10, IID =   2, ITMX= 8, ITNW= 5, NWTN= 3, JAC= 0
-EPSL= 1e-07, EPSU = 1e-07, EPSS =0.0001
-DS  =   0.1, DSMIN=  0.0001, DSMAX=   1e-1, IADS=   1
-NPAR = 1, THL =  {}, THU =  {}
-UZSTOP = {'s': [0.0, 1.0]}
+IRS  = 0  # This constant sets the label of the solution where the computation is to be restarted.
+          #  - IRS=0 : This setting is typically used in the first run of a new problem. In this case a
+          #  starting solution must be defined in the user-supplied routine STPNT. For representative
+          #  examples of analytical starting solutions see demos ab and frc. For starting from unlabeled
+          #  numerical data see the dat command above, and demos lor and pen.
+          #  - IRS>0 : Restart the computation at the previously computed solution with label IRS.
+          #  This solution is normally expected to be in the current data-file s.xxx; see also the @r and
+          #  @R commands in Section 5. Various AUTO-constants can be modified when restarting.
+          #  - IRS<0 : Restart the computation at the -IRSth computed solution in the restart file. This
+          #  is especially useful if you do not want to look up label numbers and know for sure that
+          #  the solution to continue from is at a fixed position.
+          #  - IRS=’XYn’ : Restart the computation at the nth label of type XY in the restart file, for
+          #  instance ’HB12’ to restart at the twelfth Hopf bifurcation.
+
+ILP  = 0  # - ILP=0 : No detection of folds. This choice is recommended.
+          #  - ILP=1 : Detection of folds. To be used if subsequent fold continuation is intended.
+ICP  = ['s']  # For each equation type and for each continuation calculation there is a typical (“generic”)
+              #  number of problem parameters that must be allowed to vary, in order for the calculations to be
+              #  properly posed. The array ICP designates these free parameters. The parameter that appears
+              #  first in the ICP list is called the “principal continuation parameter”.
+NTST = 35  # The number of mesh intervals used for discretization.
+NCOL = 4  # The number of Gauss collocation points per mesh interval, (2 ≤ NCOL ≤ 7).
+IAD  = 3  # IAD=0 : Fixed mesh. Normally, this choice should never be used.
+          #  IAD>0 : Adapt the mesh every IAD steps along the family. Most demos use IAD=3, which is the strongly recommended value.
+#SP = []  # - SP=[’LP0’] turn off detection of folds.
+          #  - SP=[’LP’,’HB3’,’BP0’,’UZ3’] turn on the detection of folds and Hopf bifurcations, turn off detection of branch points
+          #  and stop at the third Hopf bifurcation or third user defined point, whichever comes first.
+
+# try ISP=2 and ISP=0
+ISP  = 2  # - ISP=0 : This setting disables the detection of Hopf bifurcations, branch points, period-
+          #  doubling bifurcations, and torus bifurcations and the computation of Floquet multipliers.
+          #  - ISP=1 : Branch points and Hopf bifurcations are detected for algebraic equations. Branch
+          #  points, period-doubling bifurcations and torus bifurcations are not detected for periodic
+          #  solutions and boundary value problems. However, Floquet multipliers are computed.
+          #  - ISP=2 : This setting enables the detection of all special solutions. For periodic solutions
+          #  and rotations, the choice ISP=2 should be used with care, due to potential inaccuracy in
+          #  the computation of the linearized Poincare map and possible rapid variation of the Floquet
+          #  multipliers. The linearized Poincare map always has a multiplier z = 1. If this multiplier
+          #  becomes inaccurate then the automatic detection of secondary periodic bifurcations will
+          #  be discontinued and a warning message will be printed in fort.9. See also Section 11.4.
+          #  - ISP=3 : Hopf bifurcations will not be detected. Branch points will be detected, and
+          #  AUTO will monitor the Floquet multipliers. Period-doubling and torus bifurcations will go
+          #  undetected. This option is useful for certain problems with non-generic Floquet behavior.
+          #  - ISP=4 : Branch points and Hopf bifurcations are detected for algebraic equations. Branch
+          #  points are not detected for periodic solutions and boundary value problems. AUTO will
+          #  monitor the Floquet multipliers, and period-doubling and torus bifurcations will be detected.
+ISW  = 1  # This constant controls branch switching at branch points for the case of differential equations.
+          #  Note that branch switching is automatic for algebraic equations.
+          #  - ISW=1 : This is the normal value of ISW.
+          #  - ISW=−1 : If IRS is the label of a branch point or a period-doubling bifurcation then branch
+          #  switching will be done. For period doubling bifurcations it is recommended that NTST be
+          #  increased. For examples see Run 2 and Run 3 of demo lor, where branch switching is
+          #  done at period-doubling bifurcations, and Run 2 and Run 3 of demo bvp, where branch
+          #  switching is done at a transcritical branch point.
+          #  - ISW=2 : If IRS is the label of a fold, a Hopf bifurcation point, a period-doubling, a torus
+          #  bifurcation, or, in a non-generic (symmetric) system, a branch point then a locus of such
+          #  points will be computed. An additional free parameter must be specified for such continuations; see also Section 10.7.
+          #  - ISW=3 : If IRS is the label of a branch point in a generic (non-symmetric) system then a locus of such points will be computed. Two additional free parameters must be specified
+          #  for such continuations; see also Section 10.7.
+IPLT = 0  #  If IPLT = 0 then the L2 -norm is printed.
+NBC  = 0  # The number of boundary conditions as specified in the user-supplied routine BCND.
+NINT = 0  # The number of integral conditions as specified in the user-supplied routine ICND.
+NMX  = 1000000  # The maximum number of steps to be taken along any family.
+NPR  = 10000
+MXBF = 10  # This constant, which is effective for algebraic problems only, sets the maximum number of bifurcations to be treated.
+IID  = 2  # This constant controls the amount of diagnostic output printed in fort.9 : the greater IID the
+          #  more detailed the diagnostic output.
+          #  - IID=0 : No diagnostic output.
+          #  - IID=1 : Minimal diagnostic output. This setting is not recommended.
+          #  - IID=2 : Regular diagnostic output. This is the recommended value of IID.
+          #  - IID=3 : This setting gives additional diagnostic output for algebraic equations, namely the
+          #  Jacobian and the residual vector at the starting point. This information, which is printed
+          #  at the beginning of fort.9, is useful for verifying whether the starting solution in STPNT
+          #  is indeed a solution.
+          #  - IID=4 : This setting gives additional diagnostic output for differential equations, namely
+          #  the reduced system and the associated residual vector. This information is printed for ev-
+          #  ery step and for every Newton iteration, and should normally be suppressed. In particular
+          #  it can be used to verify whether the starting solution is indeed a solution. For this purpose,
+          #  the stepsize DS should be small, and one should look at the residuals printed in the fort.9
+          #  output-file. (Note that the first residual vector printed in fort.9 may be identically zero,
+          #  as it may correspond to the computation of the starting direction. Look at the second
+          #  residual vector in such case.) This residual vector has dimension NDIM+NBC+NINT+1,
+          #  which accounts for the NDIM differential equations, the NBC boundary conditions, the NINT
+          #  user-defined integral constraints, and the pseudo-arclength equation. For proper inter-
+          #  pretations of these data one may want to refer to the solution algorithm for solving the
+          #  collocation system, as described in Doedel, Keller & Kernevez (1991b).
+          #  - IID=5 : This setting gives very extensive diagnostic output for differential equations,
+          #  namely, debug output from the linear equation solver. This setting should not normally
+          #  be used as it may result in a huge fort.9 file. It gives incomplete results when used in
+          #  combination with MPI parallellization.
+
+ITMX = 8  # The maximum number of iterations allowed in the accurate location of special solutions, such
+          #  as bifurcations, folds, and user output points, by Muller’s method with bracketing. The recom-
+          #  mended value is ITMX=8, used in most demos.
+ITNW = 5  # The maximum number of combined Newton-Chord iterations.
+NWTN = 3  # After NWTN Newton iterations the Jacobian is frozen, i.e., AUTO uses full Newton for the first
+          #  NWTN iterations and the Chord method for iterations NWTN+1 to ITNW. The choice NWTN=3 is strongly recommended
+JAC  = 0
+EPSL = 1e-07  # Relative convergence criterion for equation parameters in the Newton/Chord method. Most
+              #  demos use EPSL=10^−6 or EPSL=10^−7 , which is the recommended value range.
+EPSU = 1e-07  # Relative convergence criterion for solution components in the Newton/Chord method. Most
+              #  demos use EPSU=10^−6 or EPSU=10^−7 , which is the recommended value range.
+EPSS = 0.0001  # Relative arclength convergence criterion for the detection of special solutions.
+               #  Most demos use 10^−4 or 10^-5 , which is the recommended value range. Generally, EPSS should be
+               #  approximately 100 to 1000 times the value of EPSL, EPSU.
+DS   = 0.01  # AUTO uses pseudo-arclength continuation for following solution families. The pseudo-arclength stepsize is the distance between the current solution and the next solution on a family.
+DSMIN= 0.0001  # This is minimum allowable absolute value of the pseudo-arclength stepsize. 
+DSMAX= 1e-1  # The maximum allowable absolute value of the pseudo-arclength stepsize.
+IADS = 1  # IADS=0 : Use fixed pseudo-arclength stepsize. Not recommended.
+	      #  IADS>0 : Adapt the pseudo-arclength stepsize after every IADS steps.
+NPAR = 1
+THL  =  {}  # By default, the pseudo-arclength stepsize includes all state variables (or state functions) and all
+            #  free parameters. Under certain circumstances one may want to modify the weight accorded to
+            #  individual parameters in the definition of stepsize. For this purpose, THL defines the parameters
+            #  whose weight is to be modified.
+THU  =  {}  # Under certain circumstances one may want to modify the weight accorded to individual state
+            #  variables (or state functions) in the definition of stepsize. For this purpose, THU defines the
+            #  number of states whose weight is to be modified. If THU={} then all weights will have default
+            #  value 1.0, else one must enter pairs, {State Index : Weight, ...} .use this option.
+#UZSTOP = {'s': [0.0, 1.0]}
+UZR = {1:.6, 1:0.0, 1:5e-1}
+RL0 = 0.0  # The lower bound on the principal continuation parameter. (This is the parameter which appears first in the ICP list.
+RL1 = 1.0  # The upper bound on the principal continuation parameter.
+#A0 = 0  # The lower bound on the principal solution measure. (By default, the principal solution measure is the L2 -norm of the state vector)
+#A1 = 1000  # The upper bound on the principal solution measure.
 
