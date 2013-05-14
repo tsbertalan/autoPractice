@@ -72,8 +72,12 @@ def getSoln(verbose=False, X0=None, tmax=3000, s=0.5, plot=False):
     
 # print X.shape
 
-def displayFortran():
-    X, T = getSoln(verbose=False, plot=True)
+def displayFortran(stationary=False):
+    if stationary:
+        X0 = np.zeros((240,))
+    else:
+        X0 = None
+    X, T = getSoln(verbose=False, plot=True, X0=X0)
     initial = X[800, :]
     pp = pprint.PrettyPrinter(indent=4).pprint
     pp((X.shape, T.shape))
@@ -99,5 +103,6 @@ def writeDatFile(verbose=False, X0=None):
     datfile.close()
 
 if __name__=="__main__":
-#     displayFotran()
+#     displayFotran(stationary=False) # print out Fortran code for initializing for a stationary solution.
+#     displayFortran(stationary=True)  # print out Fortran code for initializing for a traveling-wave
     writeDatFile()
