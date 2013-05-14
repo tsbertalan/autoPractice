@@ -64,16 +64,16 @@ from wasylenko import main, plotMultiple
 import numpy as np
 import pprint
 
-def getSoln(verbose=False, X0=None, tmax=3000, s=0.5):
+def getSoln(verbose=False, X0=None, tmax=3000, s=0.5, plot=False):
     '''Use X0=np.zeros((240,)) for an initial zero condition.'''
     # X, T = main(N=60, omega=6, tmax=2000, s=0.6, nstep=1000, verbose=False, X0=np.zeros((240,)))
-    X, T = main(N=60, omega=6, tmax=tmax, s=s, nstep=1000, verbose=verbose, X0=X0)
+    X, T = main(N=60, omega=6, tmax=tmax, s=s, nstep=1000, verbose=verbose, X0=X0, plot=plot)
     return X, T
     
 # print X.shape
 
 def displayFortran():
-    X, T = getSoln(verbose=False)
+    X, T = getSoln(verbose=False, plot=True)
     initial = X[800, :]
     pp = pprint.PrettyPrinter(indent=4).pprint
     pp((X.shape, T.shape))
@@ -83,6 +83,8 @@ def displayFortran():
     plt.show()
 
 def writeDatFile(verbose=False, X0=None):
+    '''Creates a file wasy.dat that contains a full period
+    of the traveling wave solution.'''
     X, T = getSoln(verbose=True, tmax=5000, s=0.5)
     plotMultiple(X[800:, :], T[800:], s=0.5, show=True)
     
