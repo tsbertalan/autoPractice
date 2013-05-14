@@ -51,7 +51,7 @@ IRS  = 0  # This constant sets the label of the solution where the computation i
 
 ILP  = 0  # - ILP=0 : No detection of folds. This choice is recommended.
           #  - ILP=1 : Detection of folds. To be used if subsequent fold continuation is intended.
-ICP  = ['s']  # For each equation type and for each continuation calculation there is a typical (“generic”)
+ICP  = ['s', 11]  # For each equation type and for each continuation calculation there is a typical (“generic”)
               #  number of problem parameters that must be allowed to vary, in order for the calculations to be
               #  properly posed. The array ICP designates these free parameters. The parameter that appears
               #  first in the ICP list is called the “principal continuation parameter”.
@@ -64,7 +64,7 @@ IAD  = 3  # IAD=0 : Fixed mesh. Normally, this choice should never be used.
           #  and stop at the third Hopf bifurcation or third user defined point, whichever comes first.
 
 # try ISP=2 and ISP=0
-ISP  = 2  # - ISP=0 : This setting disables the detection of Hopf bifurcations, branch points, period-
+ISP  = 0  # - ISP=0 : This setting disables the detection of Hopf bifurcations, branch points, period-
           #  doubling bifurcations, and torus bifurcations and the computation of Floquet multipliers.
           #  - ISP=1 : Branch points and Hopf bifurcations are detected for algebraic equations. Branch
           #  points, period-doubling bifurcations and torus bifurcations are not detected for periodic
@@ -143,7 +143,7 @@ EPSU = 1e-07  # Relative convergence criterion for solution components in the Ne
 DS   = 0.01  # AUTO uses pseudo-arclength continuation for following solution families. The pseudo-arclength stepsize is the distance between the current solution and the next solution on a family.
 DSMIN= 0.0001  # This is minimum allowable absolute value of the pseudo-arclength stepsize. 
 DSMAX= 1e-1  # The maximum allowable absolute value of the pseudo-arclength stepsize.
-IADS = 0  # IADS=0 : Use fixed pseudo-arclength stepsize. Not recommended.
+IADS = 2  # IADS=0 : Use fixed pseudo-arclength stepsize. Not recommended.
 	      #  IADS>0 : Adapt the pseudo-arclength stepsize after every IADS steps.
 NPAR = 1
 #THL  =  {11:0.0}  # By default, the pseudo-arclength stepsize includes all state variables (or state functions) and all
