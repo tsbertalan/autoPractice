@@ -86,7 +86,7 @@ SUBROUTINE FUNC(NDIM,U,ICP,PAR,IJAC,F,DFDU,DFDP)
     end do
 
 !    print *, epTC, hinf(VTC(i)), - hTC(i) , tauinf(VTC(i))
-    print *, "df(4):", dVTCdt(4), dhTCdt(4), dVREdt(4), dhREdt(4)
+!    print *, "df(4):", dVTCdt(4), dhTCdt(4), dVREdt(4), dhREdt(4)
 
 !    do i=1,N
 !        F(0*N + i) = dVTCdt(i)
