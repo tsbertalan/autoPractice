@@ -1,4 +1,4 @@
-* unames={1: 'V', 2: 'm', 3: 'h', 4: 'n', 5: 'Isyn'}
+unames={1: 'V', 2: 'm', 3: 'h', 4: 'n', 5: 'Isyn'}
 parnames={1: 'I', 2: 'g', 3: 't'}
 
 NDIM = 20,	IPS   = -2,	IRS   = 0,	ILP  = 0
