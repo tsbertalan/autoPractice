@@ -89,17 +89,19 @@ def writeDatFile(verbose=False, X0=None):
     '''Creates a file wasy.dat that contains a full period
     of the traveling wave solution.'''
     X, T = getSoln(verbose=True, tmax=5000, s=0.5)
+    istart = 611
+    istop = 732
     print T
-    print T[44]
-    print T[158]
-    plotMultiple(X[800:, :], T[800:], s=0.5, show=True)
+    print T[istart]
+    print T[istop]
+    plotMultiple(X[istart:istop, :], T[istart:istop], s=0.5, show=True)
     
     # from sys import exit; exit()
     datfile = file('wasy.dat', 'w')
-    for i in range(800, T.size):
+    for i in range(istart,istop):
         datfile.write(str(T[i]) + ' ')
         for j in range(X[i,:].size):
-            datfile.write(str(X[i,j]) + ' ')
+            datfile.write('%e' % X[i,j] + ' ')
         datfile.write('\n')
     datfile.flush()
     datfile.close()
