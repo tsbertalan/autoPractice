@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,7 +23,7 @@ def doint(initial, dxdt, tmin=0, tmax=800, nstep=1e5):
     X, infodict = integrate.odeint(dxdtextra, X0, T, full_output=True)
     return (X, T)
 
-def main(N=60, omega=6, s=.5, plot=True, tmax=.125, nstep=1000, verbose=True, X0=None):
+def main(N=60, omega=6, s=.5, plot=True, transient=True, tmax=.125, nstep=1000, verbose=True, X0=None):
     
     # parameters and auxiliary functions:
     
@@ -125,11 +126,12 @@ def main(N=60, omega=6, s=.5, plot=True, tmax=.125, nstep=1000, verbose=True, X0
         #  waves, but by transiently changing the boundary conditions it was 
         #  possible to eliminate the left-travelingwave.
         # Here is that transient modification. It's possible that I could do it better:
-        if T<600:
-            dVTCdt[0:omega] = 0
-            dhTCdt[0:omega] = 0
-            dVREdt[0:omega] = 0
-            dhREdt[0:omega] = 0
+        if transient:
+            if T<600:
+                dVTCdt[0:omega] = 0
+                dhTCdt[0:omega] = 0
+                dVREdt[0:omega] = 0
+                dhREdt[0:omega] = 0
             
 #         if 600 < T < 610:
 #             pp(X)
@@ -139,7 +141,7 @@ def main(N=60, omega=6, s=.5, plot=True, tmax=.125, nstep=1000, verbose=True, X0
     # Initial Conditions (near resting point,
     #  which was determined by poorly choosing
     #  ICs and then measuring their mean steady-state values.)
-    if X0==None:
+    if transient:
         X0 = np.ones((N * 4,))
         X0[0*N:1*N] = -49  # VTC_0
         X0[1*N:2*N] = 0    # hTC_0
@@ -262,13 +264,110 @@ def poi(s, tmax=2000, N=60, omega=6):
     ax.set_ylabel(r"$V^{TC}_{j-1}$")
     #ax.plot(X[800, 12:34])
     plt.show()
+    
+def pMap(X0, tau=None, d=1, s=0.8, omega=6, N=60):
+    if tau==None:
+        tau = findTau(X0, d=d, N=N, omega=omega, s=s)
+    X0 = shift(X0, d=d)
+    Xtau, T = main(N=N, omega=omega, s=s, plot=False, tmax=tau, verbose=False, X0=X0)
+    return Xtau[-1,:].reshape(X0.shape)
+
+def shift(X, d=1):
+    if d==0:
+        return X
+    #if d<0:
+        #print "d<0 not implemented."
+    originalShape = X.shape
+    X = X.reshape((X.size, ))
+    if abs(d)>1:
+        #There's probably a better way to do this than with recursion,
+        # but I'm feeling lazy right now.
+        d = (abs(d) - 1) * d / abs(d)
+        X = shift(X, d=d)
+    if d<0:
+        return np.hstack((X[-1], X[:-1])).reshape(originalShape)
+    else:
+        return np.hstack((X[1:], X[0])).reshape(originalShape)
+    
+def shiftSolnVec(X, d=1):
+    originalShape = X.shape
+    X = X.reshape((X.size, ))
+    N = X.size / 4
+    Vl = [X[i*N:(i+1)*N] for i in range(4)]
+    Vl = [shift(V, d=d) for V in Vl]
+    return np.hstack(Vl).reshape(originalShape)
+    
+def shiftSolnArray(A, d=1):
+    for t in range(A.shape[0]):
+        A[t,:] = shiftSolnVec(A[t,:], d=d)
+    return A
+
+def findTau(X0, d=1, pickPoint=0.5, testValue=None, searchTime=650, N=60, omega=6, s=0.8):
+    originalShape = X0.shape
+    X0 = X0.reshape((X0.size, ))
+    testIndex = int(X0.size * pickPoint)
+    #testIndex = X0.argmax()
+    if testValue==None:
+        testValue = X0[testIndex]
+    if d==0:
+        return 0
+    X0 = shiftSolnVec(X0, d=d)
+    print "start at", X0[testIndex], ", search for", testValue
+    def integrator(X0, tmax=searchTime):
+        return main(N=N, omega=omega, s=s, plot=False, transient=False, tmax=tmax, verbose=False, X0=X0)
+    Xf, T = integrator(X0)
+    closestDiff = min(list(Xf[:,testIndex] - testValue))
+    count = 0
+    #plotMultiple(Xf, T, show=True)
+    while abs(closestDiff) > 10:
+        count += 1
+        print count
+        Xf, T = integrator(Xf[-1, :], tmax=searchTime)
+        closestDiff = min(list(Xf[:,testIndex] - testValue))
+        closestIndex = list(Xf[:,testIndex] - testValue).index(closestDiff)
+        print "closest is", Xf[closestIndex, testIndex], "with diff", closestDiff
+        if count > 1:
+            print "probably looking the wrong way. try h-flipping data"
+        if count > 4:
+            print "this is taking too long. breaking."
+            break
+    closestIndex = list(Xf[:,testIndex] - testValue).index(closestDiff)
+    print closestDiff, closestIndex, T.min(), "<", T[closestIndex], "<", T.max()
+    return searchTime * count + T[closestIndex]
+    
+def testPMap():
+    from wasyData import loadData
+    data = loadData('wasys8.dat')
+    X = data[:, 1:]
+    T = data[:, 0]
+    #plotMultiple(X, T, s=0.5, show=True)
+    d = 1
+    #plotMultiple(shiftSolnArray(X, d=d), T, show=True)
+    X0 = data[60][1:]
+    #whatThis(X0=X0)
+    print findTau(X0, d=d)
+
+def whatThis(X0=None):
+    if X0==None:
+        from wasyData import loadData
+        X0 = loadData('wasys8.dat')[60][1:]
+    N = X0.size / 4
+    f = plt.figure()
+    a = f.gca()
+    a.plot(X0[0:N])
+    #for tmax in [200, 400, 600]:
+        #X, T = main(tmax=tmax, X0=X0, plot=False)
+        #a.plot(X[-1,:][0:50])
+    plt.show()
+    
 
 if __name__=="__main__":
     #main(N=60, omega=6, tmax=2000, s=0.6, nstep=1000)
     # uncomment either the sRange line to run for many values of s:
 #     sRange()
     # In that case, you might want to comment out the plt.show line.
-    poi(0.715)
-    plt.show()
-    
+    #poi(0.715)
+    #plt.show()
+    testPMap()
+    #whatThis()
 
