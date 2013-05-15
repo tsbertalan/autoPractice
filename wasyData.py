@@ -137,6 +137,14 @@ def loadFinal(filename):
     '''load only the final state vector from a auto .dat file'''
     data = loadData(filename)
     return data[-1][1:]
+
+def loadAsXT(filename):
+    '''load data in the formt it would have come out of
+    wasylenko.main().'''
+    data = loadData(filename)
+    X = data[:, 1:]
+    T = data[:, 0]
+    return (X, T)
     
 if __name__=="__main__":
 #     displayFortran(stationary=False) # print out Fortran code for initializing for a traveling-wave
