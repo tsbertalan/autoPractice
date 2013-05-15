@@ -86,12 +86,21 @@ def displayFortran(stationary=False):
     plt.plot(initial)
     plt.show()
 
-def writeDatFile(filename, verbose=False, X0=None, s=0.5):
+def writeDatFile(filename, verbose=False, X0=None, s=0.5, saveRange=(611, 732), data=None):
     '''Creates a file wasy.dat that contains a full period
-    of the traveling wave solution.'''
-    X, T = getSoln(verbose=True, tmax=5000, s=s, X0=X0)
-    istart = 611
-    istop = 732
+    of the traveling wave solution.
+    X0 should be an a 1D ndarray of length N*4=NDIM.
+    saveRange is the start and stop indicies (on the time axis) between
+       which to save the data.
+    data can be like (X, T); a nsteps*NDIM 2D array X of state variable over time,
+        and a nsteps-long 1D array T of times. If data is given, it will not be generated, obviously.
+    '''
+    if data==None:
+        X, T = getSoln(verbose=True, tmax=5000, s=s, X0=X0)
+    else:
+        X, T = data
+    istart = saveRange[0]
+    istop = saveRange[1]
     #print T
     #print T[istart]
     #print T[istop]
@@ -108,6 +117,7 @@ def writeDatFile(filename, verbose=False, X0=None, s=0.5):
     datfile.close()
 
 def showData(filename):
+    '''display the contents of an auto .dat file'''
     lines = loadData(filename)
     print lines
     fig = plt.figure()
@@ -117,10 +127,16 @@ def showData(filename):
     plt.show()
     
 def loadData(filename):
+    '''load the contents of an auto .dat file'''
     lines = file(filename).readlines()
     lines = [l.split() for l in lines]
     lines = [[float(x.replace('D', 'e')) for x in line] for line in lines]
     return np.array(lines)
+
+def loadFinal(filename):
+    '''load only the final state vector from a auto .dat file'''
+    data = loadData(filename)
+    return data[-1][1:]
     
 if __name__=="__main__":
 #     displayFortran(stationary=False) # print out Fortran code for initializing for a traveling-wave
