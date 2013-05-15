@@ -265,9 +265,9 @@ def poi(s, tmax=2000, N=60, omega=6):
     #ax.plot(X[800, 12:34])
     plt.show()
     
-def pMap(X0, tau=None, d=1, s=0.8, omega=6, N=60):
+def pMap(X0, tau=None, d=1, s=0.8, omega=6, N=60, pickPoint=0.5):
     if tau==None:
-        tau = findTau(X0, d=d, N=N, omega=omega, s=s)
+        tau = findTau(X0, d=d, N=N, omega=omega, s=s, pickPoint=pickPoint)
     X0 = shift(X0, d=d)
     Xtau, T = main(N=N, omega=omega, s=s, plot=False, tmax=tau, verbose=False, X0=X0)
     return Xtau[-1,:].reshape(X0.shape)
@@ -302,17 +302,22 @@ def shiftSolnArray(A, d=1):
         A[t,:] = shiftSolnVec(A[t,:], d=d)
     return A
 
-def findTau(X0, d=1, pickPoint=0.5, testValue=None, searchTime=650, N=60, omega=6, s=0.8):
+def findTau(X0, d=1, pickPoint=0.5, testValue=None, searchTime=650, N=60, omega=6, s=0.8, verbose=False):
     originalShape = X0.shape
     X0 = X0.reshape((X0.size, ))
-    testIndex = int(X0.size * pickPoint)
+    if type(pickPoint) == float:
+        testIndex = int(X0.size * pickPoint)
+    else:
+        testIndex = pickPoint
+    print "testIndex =", testIndex
     #testIndex = X0.argmax()
     if testValue==None:
         testValue = X0[testIndex]
     if d==0:
         return 0
     X0 = shiftSolnVec(X0, d=d)
-    print "start at", X0[testIndex], ", search for", testValue
+    if verbose:
+        print "    start at", X0[testIndex], ", search for", testValue
     def integrator(X0, tmax=searchTime):
         return main(N=N, omega=omega, s=s, plot=False, transient=False, tmax=tmax, verbose=False, X0=X0)
     Xf, T = integrator(X0)
@@ -325,41 +330,71 @@ def findTau(X0, d=1, pickPoint=0.5, testValue=None, searchTime=650, N=60, omega=
         Xf, T = integrator(Xf[-1, :], tmax=searchTime)
         closestDiff = min(list(Xf[:,testIndex] - testValue))
         closestIndex = list(Xf[:,testIndex] - testValue).index(closestDiff)
-        print "closest is", Xf[closestIndex, testIndex], "with diff", closestDiff
+        print "    closest is", Xf[closestIndex, testIndex], "with diff", closestDiff
         if count > 1:
-            print "probably looking the wrong way. try h-flipping data"
+            print "    Probably looking the wrong way. Try flipping the sign of d."
         if count > 4:
-            print "this is taking too long. breaking."
+            print "    This is taking too long. Breaking."
             break
     closestIndex = list(Xf[:,testIndex] - testValue).index(closestDiff)
-    print closestDiff, closestIndex, T.min(), "<", T[closestIndex], "<", T.max()
-    return searchTime * count + T[closestIndex]
+    tau = searchTime * count + T[closestIndex]
+    if verbose:
+        print "    tau =", tau
+    return tau
     
-def testPMap():
+def testFindTau(d=1, verbose=False):
+    print "d = ", d
     from wasyData import loadData
     data = loadData('wasys8.dat')
     X = data[:, 1:]
     T = data[:, 0]
     #plotMultiple(X, T, s=0.5, show=True)
-    d = 1
     #plotMultiple(shiftSolnArray(X, d=d), T, show=True)
     X0 = data[60][1:]
-    #whatThis(X0=X0)
-    print findTau(X0, d=d)
-
-def whatThis(X0=None):
-    if X0==None:
+    #showVec(X0)
+    return findTau(X0, d=d)
+    
+def testPMap(d=1, s=0.8, pickPoint=.5):
+    from wasyData import loadData
+    data = loadData('wasys8.dat')
+    X0 = data[60][1:]
+    X1 = pMap(X0, tau=None, d=d, s=s, omega=6, N=60, pickPoint=pickPoint)
+    diff = X0 - X1
+    showVec([X0, X1, diff], labels=['0', '1', r'$\Delta$'])
+    norm = np.linalg.norm(diff)
+    print norm
+    return norm
+        
+def showVec(X, labels=None):
+    if X==None:
         from wasyData import loadData
-        X0 = loadData('wasys8.dat')[60][1:]
-    N = X0.size / 4
+        X = loadData('wasys8.dat')[60][1:]
     f = plt.figure()
     a = f.gca()
-    a.plot(X0[0:N])
-    #for tmax in [200, 400, 600]:
-        #X, T = main(tmax=tmax, X0=X0, plot=False)
-        #a.plot(X[-1,:][0:50])
+    if labels==None:
+        labels = [None for x in X]
+        l = False
+    else: l = True
+    for x, label in zip(X, labels):
+        N = x.size / 4
+        a.plot(x[0:N], label=label)
+        #for tmax in [200, 400, 600]:
+            #X, T = main(tmax=tmax, X0=X0, plot=False)
+            #a.plot(X[-1,:][0:50])
+    if l:
+        a.legend(loc='best')
     plt.show()
     
+def manyPMapTests(width=12,show=True):
+    f = plt.figure()
+    a = f.gca()
+    width = int(width/2)
+    drange = range(-width, width)
+    a.plot(drange, [testFindTau(d=d) for d in drange])
+    a.set_xlabel("d")
+    a.set_ylabel("required period length")
+    f.savefig("drange%d.pdf" % width)
+    plt.show()
 
 if __name__=="__main__":
     #main(N=60, omega=6, tmax=2000, s=0.6, nstep=1000)
@@ -368,6 +403,5 @@ if __name__=="__main__":
     # In that case, you might want to comment out the plt.show line.
     #poi(0.715)
     #plt.show()
-    testPMap()
-    #whatThis()
-
+    #manyPMapTests(width=100)
+    testPMap(d=1, pickPoint=0.5)
