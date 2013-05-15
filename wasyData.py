@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 initial = [ "-4.90000000e+01", "-4.90000000e+01", "-4.90000000e+01", "-4.90000000e+01",
  "-4.90000000e+01", "-4.90000000e+01", "-4.89987661e+01", "-4.89983529e+01",
  "-4.89977896e+01", "-4.90185093e+01", "-4.89969299e+01", "-4.89967081e+01",
@@ -85,28 +86,43 @@ def displayFortran(stationary=False):
     plt.plot(initial)
     plt.show()
 
-def writeDatFile(verbose=False, X0=None):
+def writeDatFile(filename, verbose=False, X0=None, s=0.5):
     '''Creates a file wasy.dat that contains a full period
     of the traveling wave solution.'''
-    X, T = getSoln(verbose=True, tmax=5000, s=0.5)
+    X, T = getSoln(verbose=True, tmax=5000, s=s, X0=X0)
     istart = 611
     istop = 732
-    print T
-    print T[istart]
-    print T[istop]
+    #print T
+    #print T[istart]
+    #print T[istop]
     plotMultiple(X[istart:istop, :], T[istart:istop], s=0.5, show=True)
     
     # from sys import exit; exit()
-    datfile = file('wasy.dat', 'w')
+    datfile = file(filename, 'w')
     for i in range(istart,istop):
         datfile.write(str(T[i]) + ' ')
         for j in range(X[i,:].size):
-            datfile.write('%e' % X[i,j] + ' ')
+            datfile.write(('%e' % X[i,j]).replace('e', 'D') + ' ')
         datfile.write('\n')
     datfile.flush()
     datfile.close()
 
+def showData(filename):
+    lines = loadData(filename)
+    print lines
+    fig = plt.figure()
+    ax = fig.gca()
+    for j in range(1, len(lines[0])):
+        ax.plot([l[0] for l in lines], [l[j] for l in lines])
+    plt.show()
+    
+def loadData(filename):
+    lines = file(filename).readlines()
+    lines = [l.split() for l in lines]
+    lines = [[float(x.replace('D', 'e')) for x in line] for line in lines]
+    return np.array(lines)
+    
 if __name__=="__main__":
 #     displayFortran(stationary=False) # print out Fortran code for initializing for a traveling-wave
 #     displayFortran(stationary=True)  # print out Fortran code for initializing for a stationary solution.
-    writeDatFile()
+    writeDatFile('wasy.dat')
