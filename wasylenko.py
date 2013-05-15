@@ -199,8 +199,9 @@ def plotMultiple(X, T, s=0.5, show=True):
     im.set_interpolation('nearest')
     im.set_extent([0, N, min(T), max(T)])
     ax3.set_xlabel(r'$V^{TC}$ neuron index')
-    ax3.set_ylabel('time')
-    fig3.colorbar(im)
+    ax3.set_ylabel('time [ms]')
+    c = fig3.colorbar(im)
+    c.set_label("potential [mV]")
 
     if show:
         plt.show()
