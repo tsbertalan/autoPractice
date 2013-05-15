@@ -23,7 +23,7 @@ def doint(initial, dxdt, tmin=0, tmax=800, nstep=1e5):
     X, infodict = integrate.odeint(dxdtextra, X0, T, full_output=True)
     return (X, T)
 
-def main(N=60, omega=6, s=.5, plot=True, transient=True, tmax=.125, nstep=1000, verbose=True, X0=None):
+def main(N=60, omega=6, s=.5, plot=True, transient=True, tmax=2000, nstep=1000, verbose=True, X0=None):
     
     # parameters and auxiliary functions:
     
@@ -167,7 +167,7 @@ def main(N=60, omega=6, s=.5, plot=True, transient=True, tmax=.125, nstep=1000, 
         print "average final hRE is", vecAvg(X[-1, 3*N:4*N])
     return X, T
 
-def plotMultiple(X, T, s=0.5, show=False):
+def plotMultiple(X, T, s=0.5, show=True):
     N = X.shape[1] / 4
     N = int(N)
     fig = plt.figure(figsize=(11*1.5, 8.5*1.5))
